@@ -1,0 +1,10 @@
+#root {
+  max-width: 3280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+body {
+  max-width: cover;
+}
