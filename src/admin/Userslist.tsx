@@ -1,20 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export default function UsersManagement() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("student");
-  const [editingUser, setEditingUser] = useState(null); // currently editing user
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   // ✅ Fetch users
   const fetchUsers = async () => {
     const querySnapshot = await getDocs(collection(db, "users"));
-    const usersList = querySnapshot.docs.map((doc) => ({
+    const usersList: User[] = querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
+      ...(doc.data() as Omit<User, "id">),
     }));
     setUsers(usersList);
   };
@@ -24,7 +31,7 @@ export default function UsersManagement() {
   }, []);
 
   // ✅ Add new user
-  const handleAddUser = async (e) => {
+  const handleAddUser = async (e: FormEvent) => {
     e.preventDefault();
     if (!name || !email) return alert("Please fill in all fields.");
 
@@ -43,32 +50,27 @@ export default function UsersManagement() {
   };
 
   // ✅ Delete user
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-
     await deleteDoc(doc(db, "users", id));
     setUsers(users.filter((u) => u.id !== id));
   };
 
   // ✅ Start editing
-  const handleEdit = (user) => {
+  const handleEdit = (user: User) => {
     setEditingUser(user);
     setName(user.name);
     setEmail(user.email);
     setRole(user.role);
   };
 
-  // ✅ Update user details
-  const handleUpdateUser = async (e) => {
+  // ✅ Update user
+  const handleUpdateUser = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name || !email) return alert("Please fill in all fields.");
+    if (!editingUser) return;
 
     const userRef = doc(db, "users", editingUser.id);
-    await updateDoc(userRef, {
-      name,
-      email,
-      role,
-    });
+    await updateDoc(userRef, { name, email, role });
 
     alert("User updated successfully!");
     setEditingUser(null);
@@ -100,19 +102,19 @@ export default function UsersManagement() {
           type="text"
           placeholder="Full Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
           className="border p-2 rounded w-full"
         />
         <input
           type="email"
           placeholder="Email Address"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           className="border p-2 rounded w-full"
         />
         <select
           value={role}
-          onChange={(e) => setRole(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) => setRole(e.target.value)}
           className="border p-2 rounded"
         >
           <option value="student">Student</option>
@@ -156,11 +158,11 @@ export default function UsersManagement() {
               <tr key={u.id}>
                 <td className="border p-2">{u.name}</td>
                 <td className="border p-2">{u.email}</td>
-                <td className="border p-2">{u.role}</td>
+                <td className="border p-2 capitalize">{u.role}</td>
                 <td className="border p-2 text-center space-x-2">
                   <button
                     onClick={() => handleEdit(u)}
-                    className="text-blue-600  hover:underline"
+                    className="text-blue-600 hover:underline"
                   >
                     Edit
                   </button>
@@ -175,7 +177,7 @@ export default function UsersManagement() {
             ))
           ) : (
             <tr>
-              <td colSpan="4" className="border p-4 text-center text-gray-500">
+              <td colSpan={4} className="border p-4 text-center text-gray-500">
                 No users found.
               </td>
             </tr>
