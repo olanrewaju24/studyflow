@@ -71,7 +71,6 @@ export default function AdminDashboard() {
     fetchInstructors();
   }, []);
 
-  // ✅ Approve instructor
   const handleApproveInstructor = async (app) => {
     try {
       await addDoc(collection(db, "instructors"), {

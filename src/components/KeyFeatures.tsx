@@ -1,4 +1,4 @@
-import { FC } from "react";
+import type { FC } from "react";
 import { GraduationCap, Clock, Users, PlayCircle } from "lucide-react";
 import studyflowImage from "../assets/studyflow.jpg"; // ✅ Make sure this path is correct
 

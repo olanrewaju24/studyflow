@@ -1,5 +1,4 @@
-// src/pages/About.tsx
-import { FC } from "react";
+import type { FC } from "react";
 import { Users, Award, Clock, BookOpen } from "lucide-react";
 import Navbar from "../components/Navbar";
 

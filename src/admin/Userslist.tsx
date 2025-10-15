@@ -9,7 +9,7 @@ interface User {
   role: string;
 }
 
-export default function UsersManagement() {
+export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
